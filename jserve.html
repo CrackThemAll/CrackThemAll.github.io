@@ -667,10 +667,6 @@ function navigateItem(item, replace) {
   } else if (item.localName == "shortcut") {
     displayShortcut(item);
   }
-  if (typeof window.nodePrerender === "undefined" && !replace) {
-    posthog.capture('in-page navigate', {})
-    fetch("/tek-vcount.php?id=page", {cache: "no-store"});
-  }
 }
 function applyGlobalCommandBarItems() {
   var commandbar = document.getElementById("command-bar");
