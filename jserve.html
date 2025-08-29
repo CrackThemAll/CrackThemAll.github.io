@@ -1,0 +1,1250 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<style>
+@font-face {
+  font-family: 'Segoe Aero UI';
+  src: url('/segoeui.ttf');
+}
+@font-face {
+  font-family: 'Segoe Aero UI';
+  font-weight: bold;
+  src: url('/segoeuib.ttf');
+}
+* {
+  font-family: 'Segoe Aero UI', 'Segoe UI';
+  font-size: 9pt;
+  outline: none;
+}
+img {
+  border-style: none;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+.selectable {
+  -webkit-touch-callout: default;
+    -webkit-user-select: text;
+     -khtml-user-select: text;
+       -moz-user-select: text;
+        -ms-user-select: text;
+            user-select: text;
+}
+#command-bar {
+  background: url('/command-bar-bg.png');
+  height: 31px;
+  width: 100%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+#vertical-pane-content {
+  width: 100%;
+  flex-grow: 1;
+  flex-shrink: 1;
+  display: flex;
+  min-height: 0;
+}
+#contents-pane {
+  height: 100%;
+  flex-grow: 1;
+  position: relative;
+  box-sizing: border-box;
+  overflow: auto;
+}
+.content-pane[type=folder] {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
+  padding: 6px;
+  z-index: 1;
+  --icon-size: 96px;
+}
+#left-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex-shrink: 0;
+  width: 176px;
+}
+#navigation-pane {
+  position: relative;
+  min-height: 0;
+  overflow: auto;
+  height: 100%;
+  border-right: 1px solid rgb(214, 229, 245);
+}
+#details-pane {
+  background: url('/details-pane-bg.png');
+  height: 53px;
+  width: 100%;
+  flex-shrink: 0;
+}
+#command-bar > a {
+  color: rgb(30, 57, 91);
+  text-decoration: none;
+  border: 3px solid transparent;
+  height: 19px;
+  width: max-content;
+  line-height: 19px;
+  text-align: center;
+  margin: 3px;
+  display: inline-block;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+#command-bar > a:hover {
+  border-image: url('/command-bar-btn-hover.png') 3 fill stretch;
+}
+.content-pane[type=folder] > a {
+  display: inline-flex;
+  margin: 5px;
+  border: 3px solid transparent;
+  text-align: center;
+  color: black;
+  text-decoration: none;
+  cursor: default;
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+.content-pane[type=folder]:not(:focus-within) > a.active {
+  border-image: url('/item-desel-bg.png') 3 fill stretch;
+}
+.content-pane[type=folder]:focus-within > a.active:not(:hover):not(:focus-within) {
+}
+.content-pane[type=folder] > a:hover {
+  border-image: url('/item-hot-bg.png') 3 fill stretch;
+}
+.content-pane[type=folder] > a:focus-within {
+  border-image: url('/item-sel-bg.png') 3 fill stretch;
+}
+.content-pane[type=folder] > a > div.item-container > div.icon {
+  width: max-content;
+  height: max-content;
+  position: relative;
+}
+.content-pane[type=folder] > a > div.item-container > div.icon > div.iconCrop {
+  max-width: var(--icon-size);
+  max-height: var(--icon-size);
+}
+.content-pane[type=folder] > a > div.item-container > div.icon > div.iconCrop > img {
+  max-width: var(--icon-size);
+  max-height: var(--icon-size);
+}
+.content-pane[type=folder] > a > div.item-container > div.icon.video > div.iconCrop {
+  max-width: calc(var(--icon-size)*0.75);
+  margin: 0 calc(var(--icon-size)/8);
+  overflow: hidden;
+}
+.content-pane[type=folder] > a > div.item-container > div.icon.video > div.iconCrop > img {
+  position: relative;
+  left: calc(var(--icon-size)/-8);
+  right: calc(var(--icon-size)/-8);
+}
+.content-pane[type=folder] > a > div.item-container > div.icon > div.videoOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/video-reel.png') center center / 100% auto no-repeat;
+}
+.content-pane[type=folder] > a > div.item-container > div.icon.video {
+  max-height: calc(var(--icon-size) / (96/51));
+  /*
+  // 96/51 magic constant. found by accidentially applying
+  // the 4.25em limit (51px, 3 lines of text) to the wrong element
+  // which had 96px width (icon size)
+  */
+  overflow: hidden;
+}
+.content-pane[type=folder] > a > div.text-container {
+  text-align: left;
+}
+.content-pane[type=folder] > a > div.text-container > div.name {
+  border-bottom: 1px solid #aaaaaa;
+  display: inline;
+  margin-left: 16px;
+}
+.content-pane[type=folder] > a > div.item-container > div.name {
+  max-width: var(--icon-size);
+  max-height: 4.25em;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+.content-pane[type=folder] > a:focus-within > div.item-container > div.name {
+  max-height: unset;
+}
+.content-pane[type=video] {
+  display: flex;
+  flex-direction: column;
+  background: rgb(247, 247, 247);
+}
+.content-pane[type=video] > #videoEmbedNoJS {
+  width: 100%;
+  height: 100%;
+}
+.content-pane[type=video] > #videoContainer {
+  width: calc(100% - 8px);
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  pointer-events: none;
+  margin: 4px;
+}
+.content-pane[type=video] > #videoContainer > #videoFlowContainer {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.content-pane[type=video] > #videoContainer > #videoFlowContainer > iframe {
+  width: 300%;
+  height: 100%;
+  margin-left: -100%;
+  border: none;
+}
+.content-pane[type=video] > #videoControls {
+  width: 100%;
+  height: 29px;
+  display: flex;
+  align-items: center;
+}
+.content-pane[type=video] > #videoControls > #videoControlsPlay {
+  width: 29px;
+  height: 100%;
+  background: url("/video-controls-play.png") center center no-repeat;
+  margin-left: 4px;
+}
+.content-pane[type=video] > #videoControls > #videoControlsPlay:hover {
+  background: url("/video-controls-play-hot.png") center center no-repeat;
+}
+.content-pane[type=video] > #videoControls > #videoControlsPlay:active {
+  background: url("/video-controls-play-click.png") center center no-repeat;
+}
+.content-pane[type=video] > #videoControls.playing > #videoControlsPlay {
+  background: url("/video-controls-pause.png") center center no-repeat;
+}
+.content-pane[type=video] > #videoControls.playing > #videoControlsPlay:hover {
+  background: url("/video-controls-pause-hot.png") center center no-repeat;
+}
+.content-pane[type=video] > #videoControls.playing > #videoControlsPlay:active {
+  background: url("/video-controls-pause-click.png") center center no-repeat;
+}
+.content-pane[type=video] > #videoControls > #videoControlsProgContainer {
+  flex-grow: 1;
+  height: 100%;
+  margin-left: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+.content-pane[type=video] > #videoControls > #videoControlsProgContainer > #videoControlsProg {
+  width: 100%;
+  height: 1px;
+  position: relative;
+  border: 2px solid transparent;
+  border-image: url('/video-controls-prog.png') 2 fill stretch;
+}
+.content-pane[type=video] > #videoControls > #videoControlsProgContainer > #videoControlsProg > div {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  height: 1px;
+  border: 2px solid transparent;
+  border-image: url('/video-controls-prog-full.png') 2 fill stretch;
+}
+.content-pane[type=video] > #videoControls > #videoControlsMute {
+  width: 29px;
+  height: 100%;
+  position: relative;
+}
+.content-pane[type=video] > #videoControls > #videoControlsMute > #videoControlsMuteIcon {
+  width: 100%;
+  height: 100%;
+}
+.content-pane[type=video] > #videoControls.vol-none > #videoControlsMute > #videoControlsMuteIcon {
+  background: url('/vol-none.png') center center no-repeat;
+}
+.content-pane[type=video] > #videoControls.vol-low > #videoControlsMute > #videoControlsMuteIcon {
+  background: url('/vol-low.png') center center no-repeat;
+}
+.content-pane[type=video] > #videoControls.vol-medium > #videoControlsMute > #videoControlsMuteIcon {
+  background: url('/vol-medium.png') center center no-repeat;
+}
+.content-pane[type=video] > #videoControls.vol-high > #videoControlsMute > #videoControlsMuteIcon {
+  background: url('/vol-high.png') center center no-repeat;
+}
+.content-pane[type=video] > #videoControls.muted > #videoControlsMute > #videoControlsMuteIcon {
+  background: url('/vol-mute.png') center center no-repeat;
+}
+.content-pane[type=video] > #videoControls > #videoControlsMute:hover {
+  background: url('/volbtn-hot.png') center center no-repeat;
+}
+.content-pane[type=video] > #videoControls > #videoControlsMute:active {
+  background: url('/volbtn-click.png') center center no-repeat;
+}
+.content-pane[type=video] > #videoControls > #videoControlsRes {
+  width: max-content;
+  margin-right: 4px;
+}
+#navigation-pane details {
+  width: 100%;
+  padding-left: 10px;
+  display: block;
+  box-sizing: border-box;
+}
+#navigation-pane > details {
+  padding-left: 0;
+}
+#navigation-pane details > summary {
+  width: calc(100% - 6px);
+  height: 17px;
+  line-height: 17px;
+  border: 3px solid transparent;
+  list-style: none;
+}
+#navigation-pane details > summary::-webkit-details-marker {
+  display: none;
+}
+#navigation-pane details > summary:active {
+  pointer-events: none;
+}
+#navigation-pane details > summary > a {
+  position: absolute;
+  left: 0px;
+  width: 100%;
+  height: 23px;
+  z-index: 0;
+  transform: translate(0, -3px);
+  cursor: default;
+}
+#navigation-pane details > summary > a:hover {
+  pointer-events: auto;
+}
+#navigation-pane details > summary > div > a {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+#navigation-pane details > summary > div > a:hover {
+  pointer-events: auto;
+}
+#navigation-pane details.leaf > summary > div {
+  padding-left: 16px;
+}
+#navigation-pane details > summary > div > .bullet {
+  display: inline-block;
+  height: 100%;
+  width: 16px;
+  background: url('/treeitem-null.png') center center no-repeat;
+  opacity: 0;
+  transition: opacity 2s;
+  cursor: default;
+  pointer-events: auto;
+}
+#navigation-pane details.leaf > summary > div > .bullet {
+  display: none;
+}
+#navigation-pane:hover details > summary > div > .bullet,
+#navigation-pane:focus-within details > summary > div > .bullet {
+  opacity: 1;
+  transition: opacity .5s;
+}
+#navigation-pane details:not(.leaf) > summary > div > .bullet {
+  background: url('/treeitem-closed.png') left center no-repeat;
+}
+#navigation-pane details:not(.leaf)[open] > summary > div > .bullet {
+  background: url('/treeitem-open.png') left center no-repeat;
+}
+#navigation-pane details:not(.leaf) > summary > div > .bullet:hover {
+  background: url('/treeitem-hot-closed.png') left center no-repeat;
+}
+#navigation-pane details:not(.leaf)[open] > summary > div > .bullet:hover {
+  background: url('/treeitem-hot-open.png') left center no-repeat;
+}
+#navigation-pane details > summary:hover::before,
+#navigation-pane details > summary:focus-within::before,
+#navigation-pane:not(:focus-within) details.active > summary::before {
+  content: '';
+  position: absolute;
+  left: 0px;
+  width: calc(100% - 8px);
+  margin-left: 1px;
+  margin-right: 1px;
+  height: 17px;
+  border: 3px solid transparent;
+  z-index: -1;
+  transform: translate(0, -3px);
+}
+#navigation-pane details > summary:hover::before {
+  border-image: url('/item-hot-bg.png') 3 fill stretch;
+}
+#navigation-pane details > summary:focus-within::before {
+  border-image: url('/item-sel-bg.png') 3 fill stretch;
+}
+#navigation-pane:not(:focus-within) details.active > summary::before {
+  border-image: url('/item-desel-bg.png') 3 fill stretch;
+}
+#navigation-pane:not(:focus-within) details.active > summary:hover::before,
+#navigation-pane details > summary:focus-within:hover::before {
+  border-image: url('/item-hotsel-bg.png') 3 fill stretch;
+}
+#navigation-pane details > summary > div {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+#navigation-pane details > summary > div > a > .name {
+  position: absolute;
+  top: 0;
+  padding-left: 4px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: calc(100% - 36px);
+}
+#navigation-pane > details:first-child {
+  margin-top: 10px;
+}
+#navigation-pane > details:not(:first-child) {
+  margin-top: 20px;
+}
+#fsroot {
+  display: none;
+}
+.dirheader-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 54px;
+  padding-left: 14px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: center;
+  gap: 16px;
+  background: url('/rtf-info-header-bg-stripes.png') left top / 500px 55px no-repeat,
+              url('/rtf-info-header-bg-left.png') left center / 29px 100% no-repeat,
+              url('/rtf-info-header-bg-right.png') right center / 29px 100% no-repeat,
+              url('/rtf-info-header-bg-main.png') center center / 100% 100% no-repeat;
+}
+.dirheader-container > img {
+  max-width: 48px;
+  max-height: 48px;
+}
+.dirheader-body {
+  margin-bottom: auto;
+}
+.dirheader-title {
+  font-size: 14pt;
+  color: rgb(0, 110, 18);
+}
+.dirheader-description {
+  font-size: 9pt;
+  color: rgb(128, 128, 128);
+}
+.groupheader-container {
+  width: 100%;
+  height: 24px;
+  border: 3px solid transparent;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: center;
+}
+.groupheader-container:hover {
+  border-image: url('/item-hot-bg.png') 3 fill stretch;
+}
+.groupheader-bullet {
+  height: 100%;
+  width: 16px;
+  background: url('/treeitem-open.png') left center no-repeat;
+}
+.groupheader-text {
+  padding-left: 4px;
+  padding-right: 8px;
+  color: rgb(30, 50, 135);
+  font-size: 12pt;
+  height: 24px;
+  line-height: 24px;
+  transform: translate(0, -1px);
+}
+.groupheader-border {
+  flex-grow: 1;
+  height: 1px;
+  background: rgb(229, 229, 229);
+  margin-right: 8px;
+}
+.cplgroupheader-container {
+  width: 100%;
+  height: 24px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: center;
+}
+.cplgroupheader-text {
+  padding-right: 2px;
+  height: 24px;
+  line-height: 24px;
+  transform: translate(0, -1px);
+}
+.cplgroupheader-border {
+  flex-grow: 1;
+  height: 1px;
+  background: rgb(229, 229, 229);
+  margin-right: 4px;
+}
+.cpl-link {
+  text-decoration: none;
+  color: rgb(0, 102, 204);
+}
+.cpl-link:hover {
+  text-decoration: underline;
+  color: rgb(51, 153, 255);
+}
+h1 {
+  color: rgb(30, 50, 135);
+  font-size: 12pt;
+  font-weight: normal;
+}
+.large-headings h1 {
+  font-size: 20pt;
+}
+.large-headings h2 {
+  font-size: 14pt;
+}
+template {
+  display: none;
+}
+#command-bar > #menu-toggle {
+  display: none;
+}
+@media (max-height: 45rem) {
+  #details-pane {
+    display: none;
+  }
+  #command-bar {
+    display: none;
+  }
+}
+@media (max-width: 34rem) {
+  #left-container.reveal {
+    width: 100%;
+    border-right: none;
+  }
+  #left-container.reveal + #contents-pane {
+    display: none;
+  }
+  #left-container:not(.reveal) {
+    display: none;
+  }
+  #command-bar > #menu-toggle {
+    display: inline-block;
+  }
+  #command-bar {
+    display: block;
+  }
+  #details-pane {
+    display: none;
+  }
+}
+.dirheader-padding {
+  width: 100%;
+  height: 52px;
+}
+.content-group {
+  width: 100%;
+  flex: 1 1 100% !important;
+}
+#navigation-pane details.container > details {
+  padding-left: 0;
+}
+#navigation-pane details.container > summary {
+  display: none;
+}
+#navigation-pane details.hidden {
+  display: none;
+}
+.item-description {
+  max-width: 196px;
+  padding-top: 4px;
+  padding-left: 16px;
+  padding-right: 16px;
+  margin: 0;
+  font-size: 11.5pt;
+}
+</style>
+<!--[if IE]>
+  <script src="https://cdn.jsdelivr.net/gh/nuxodin/ie11CustomProperties@4.1.0/ie11CustomProperties.min.js"></script> 
+<![endif]-->
+<script>
+function navigateItem(item, replace) {
+  if (replace) {
+    history.replaceState(null, "", getItemPath(item));
+  } else {
+    history.pushState(null, "", getItemPath(item));
+  }
+  if (item.id == "fsroot") {
+    item = getItemForPath("/Favorites/Home/");
+  }
+  var navpane = document.getElementById("navigation-pane");
+  navpane.classList.remove("reveal");
+  document.title = item.getAttribute("name") + " - Tech Stuff";
+  var icon = document.querySelector("link[rel~='icon']");
+  if (!icon) {
+    icon = document.createElement('link');
+    icon.rel = 'icon';
+    document.head.appendChild(icon);
+  }
+  if (getItemPath(item) == "/Favorites/Home/") {
+    icon.href = "/icons/full/teknixstuff.ico";
+  } else {
+    icon.href = "/icons/16x16/" + item.getAttribute("icon") + ".png";
+  }
+  var canonical = document.querySelector("link[rel~='canonical']");
+  if (!canonical) {
+    canonical = document.createElement('link');
+    canonical.rel = 'canonical';
+    document.head.appendChild(canonical);
+  }
+  if (getItemPath(item) == "/Favorites/Home/") {
+    canonical.href = "https://teknixstuff.com/";
+  } else {
+    canonical.href = "https://teknixstuff.com" + getItemPath(item);
+  }
+  navigateTree(item);
+  var contentpane = document.getElementById("contents-pane");
+  contentpane.className = "content-pane";
+  if (item.localName == "folder") {
+    displayFolder(item);
+  } else if (item.localName == "video") {
+    displayVideo(item);
+  } else if (item.localName == "rtf") {
+    displayRTF(item);
+  } else if (item.localName == "link") {
+    displayLink(item);
+  } else if (item.localName == "shortcut") {
+    displayShortcut(item);
+  }
+  if (typeof window.nodePrerender === "undefined" && !replace) {
+    posthog.capture('in-page navigate', {})
+    fetch("/tek-vcount.php?id=page", {cache: "no-store"});
+  }
+}
+function applyGlobalCommandBarItems() {
+  var commandbar = document.getElementById("command-bar");
+  commandbar.innerHTML = "";
+  var menuToggle = document.createElement("a");
+  menuToggle.id = "menu-toggle";
+  menuToggle.textContent = "Menu";
+  menuToggle.href = "javascript:undefined";
+  menuToggle.addEventListener("click", function(){
+    var leftpane = document.getElementById("left-container");
+    leftpane.classList.toggle("reveal");
+  });
+  commandbar.appendChild(menuToggle);
+}
+function displayLink(link) {
+  if (link.hasAttribute("notify")) {
+    posthog.capture('link event ' + link.getAttribute("notify"))
+    fetch("/tek-vcount.php?id=" + link.getAttribute("notify"));
+  }
+  open(link.getAttribute("href"));
+  history.back();
+}
+function displayShortcut(shortcut) {
+  navigateItem(getItemForPath(shortcut.getAttribute("target")), true);
+}
+function displayRTF(rtf) {
+  applyGlobalCommandBarItems();
+  var contentpane = document.getElementById("contents-pane");
+  contentpane.innerHTML = "";
+  contentpane.setAttribute("type", "rtf");
+  var children = document.getElementById("rtf-" + rtf.getAttribute("docid")).childNodes;
+  for (var i = 0; i < children.length; i++) {
+    contentpane.appendChild(children[i].cloneNode(true));
+  }
+}
+function displayVideoPrerender(video, contentpane) {
+  applyGlobalCommandBarItems();
+  contentpane ||= document.getElementById("contents-pane");
+  contentpane.innerHTML = "";
+  contentpane.setAttribute("type", "video");
+  var videoEmbed = document.createElement("video");
+  contentpane.appendChild(videoEmbed);
+  videoEmbed.src = "https://inv.nadeko.net/watch?v=" + video.getAttribute("ytid") + "&quality=hd720&raw=1";
+  videoEmbed.controls = true;
+  videoEmbed.autoplay = true;
+  videoEmbed.id = "videoEmbedNoJS";
+}
+function displayVideo(video, contentpane) {
+  // If running in the node prerenderer, do your best without outputting required JS code or using the YT iframe api
+  if (typeof window.nodePrerender !== "undefined") {
+    return displayVideoPrerender(video);
+  }
+  applyGlobalCommandBarItems();
+  contentpane ||= document.getElementById("contents-pane");
+  contentpane.innerHTML = "";
+  contentpane.setAttribute("type", "video");
+  delete window.onYouTubeIframeAPIReady;
+  if (typeof YT === "undefined") {
+    window.onYouTubeIframeAPIReady = function(){
+      displayVideo(video);
+    };
+    var ytScript = document.createElement("script");
+    ytScript.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(ytScript);
+    return;
+  }
+  var videoContainer = document.createElement("div");
+  contentpane.appendChild(videoContainer);
+  videoContainer.id = "videoContainer";
+
+  var videoFlowContainer = document.createElement("div");
+  videoContainer.appendChild(videoFlowContainer);
+  videoFlowContainer.id = "videoFlowContainer";
+  videoFlowContainer.style.filter = "brightness(0)";
+
+  var videoControls = document.createElement("div");
+  contentpane.appendChild(videoControls);
+  videoControls.id = "videoControls";
+
+  var videoControlsPlay = document.createElement("a");
+  videoControls.appendChild(videoControlsPlay);
+  videoControlsPlay.id = "videoControlsPlay";
+
+  var videoControlsProgContainer = document.createElement("div");
+  videoControls.appendChild(videoControlsProgContainer);
+  videoControlsProgContainer.id = "videoControlsProgContainer";
+
+  var videoControlsProg = document.createElement("div");
+  videoControlsProgContainer.appendChild(videoControlsProg);
+  videoControlsProg.id = "videoControlsProg";
+
+  var videoControlsProgFill = document.createElement("div");
+  videoControlsProg.appendChild(videoControlsProgFill);
+
+  var videoControlsMute = document.createElement("a");
+  videoControls.appendChild(videoControlsMute);
+  videoControlsMute.id = "videoControlsMute";
+
+  var videoControlsMuteIcon = document.createElement("div");
+  videoControlsMute.appendChild(videoControlsMuteIcon);
+  videoControlsMuteIcon.id = "videoControlsMuteIcon";
+
+  var videoControlsRes = document.createElement("div");
+  videoControls.appendChild(videoControlsRes);
+  videoControlsRes.id = "videoControlsRes";
+
+  var videoEmbed = document.createElement("div");
+  videoFlowContainer.appendChild(videoEmbed);
+  var player = new YT.Player(videoEmbed, {
+    videoId: video.getAttribute("ytid"),
+    playerVars: {
+      "controls": 0,
+      "disablekb": 0,
+      "playsinline": 1,
+      "v3cv": 0,
+    },
+    events: {
+      "onReady": function(event){
+        videoEmbed = player.getIframe();
+        videoControlsPlay.addEventListener("click", function(){
+          if (player.getPlayerState() == 1) {
+            player.pauseVideo();
+          } else {
+            player.playVideo();
+          }
+        });
+        videoControlsProgContainer.addEventListener("click", function(event){
+          var positionFloat = (event.pageX - videoControlsProgContainer.getBoundingClientRect().left)/(videoControlsProgContainer.getBoundingClientRect().width);
+          var position = positionFloat*player.getDuration();
+          player.seekTo(position, true);
+        });
+        videoControlsMute.addEventListener("click", function(event){
+          if (player.isMuted()) {
+            player.unMute();
+            videoControls.classList.remove("muted");
+          } else {
+            player.mute();
+            videoControls.classList.add("muted");
+          }
+        });
+        if (player.isMuted()) {
+          videoControls.classList.add("muted");
+        }
+        if (player.getVolume() == 0) {
+          videoControls.classList.add("vol-none");
+        } else if (player.getVolume() <= 33) {
+          videoControls.classList.add("vol-low");
+        } else if (player.getVolume() <= 66) {
+          videoControls.classList.add("vol-medium");
+        } else if (player.getVolume() <= 100) {
+          videoControls.classList.add("vol-high");
+        }
+        player.playVideo();
+      },
+      "onStateChange": function(event){
+        if (event.data == YT.PlayerState.PLAYING) {
+          videoControls.classList.add("playing");
+          videoFlowContainer.style.filter = "";
+          try {
+            player.unloadModule("captions");
+          } catch (exception) {}
+        }
+        if (event.data == YT.PlayerState.PAUSED) {
+          videoControls.classList.remove("playing");
+          videoFlowContainer.style.filter = "";
+        }
+        if (event.data == YT.PlayerState.ENDED) {
+          videoControls.classList.remove("playing");
+          videoFlowContainer.style.filter = "brightness(0)";
+        }
+      },
+      "onPlaybackQualityChange": function(event){
+        if (event.data == "tiny") {
+          videoControlsRes.textContent = "144p";
+        }
+        if (event.data == "small") {
+          videoControlsRes.textContent = "240p";
+        }
+        if (event.data == "medium") {
+          videoControlsRes.textContent = "360p";
+        }
+        if (event.data == "large") {
+          videoControlsRes.textContent = "480p";
+        }
+        if (event.data == "hd720") {
+          videoControlsRes.textContent = "720p";
+        }
+        if (event.data == "hd1080") {
+          videoControlsRes.textContent = "1080p";
+        }
+        if (event.data == "highres") {
+          videoControlsRes.textContent = "HD";
+        }
+      }
+    }
+  });
+  (function updatePlayerProgress(){
+    if (document.body.contains(player.getIframe())) {
+      setTimeout(updatePlayerProgress);
+    }
+    if (player && player.getPlayerState) {
+      if (player.getPlayerState() == 0) {
+        videoControlsProgFill.style.width = "100%";
+        videoControlsProgFill.style.borderRight = "";
+      } else {
+        videoControlsProgFill.style.width = (player.getCurrentTime() / player.getDuration())*100 + "%";
+        videoControlsProgFill.style.borderRight = "none";
+      }
+    }
+    if (videoContainer.offsetWidth > (16/9)*videoContainer.offsetHeight) {
+      videoFlowContainer.style.maxWidth = Math.floor((16/9)*videoContainer.offsetHeight) + "px";
+      videoFlowContainer.style.maxHeight = "";
+    }
+    if (videoContainer.offsetHeight > (9/16)*videoContainer.offsetWidth) {
+      videoFlowContainer.style.maxWidth = "";
+      videoFlowContainer.style.maxHeight = Math.floor((9/16)*videoContainer.offsetWidth) + "px";
+    }
+  })();
+}
+function encodeName(name) {
+  return name.replace(/[*"/\\<>:|?]/, "_");
+}
+function getItemForPath(path) {
+  var item = document.getElementById("fsroot");
+  var pathItems = path.replace(/^\/|\/$/g, '').split("/");
+  for (var x = 0; x < pathItems.length; x++) {
+    for (var i = 0; i < item.children.length; i++) {
+      var candidate = item.children[i];
+      if (!candidate.hasAttribute("name")) {
+        continue;
+      }
+      if (encodeName(candidate.getAttribute("name")) == pathItems[x]) {
+        item = candidate;
+        break;
+      }
+    }
+  }
+  return item;
+}
+function getItemPath(item) {
+  var path = "";
+  var parent = item;
+  while (parent != document.body) {
+    path = encodeName(parent.getAttribute("name") || "") + "/" + path;
+    parent = parent.parentElement;
+  }
+  return path;
+}
+function getTreeItem(path) {
+  var treeitem = document.getElementById("navigation-pane");
+  var pathItems = path.replace(/^\/|\/$/g, '').split("/");
+  for (var x = 0; x < pathItems.length; x++) {
+    for (var i = 0; i < treeitem.children.length; i++) {
+      var candidate = treeitem.children[i];
+      if (candidate.localName != "details") {
+        continue;
+      }
+      if (encodeName(candidate.querySelector(".name").textContent) == pathItems[x]) {
+        if (treeitem.id != "navigation-pane") {
+          treeitem.open = true;
+        }
+        treeitem = candidate;
+        break;
+      }
+    }
+  }
+  return treeitem;
+}
+function navigateTree(folder) {
+  var path = getItemPath(folder);
+  var treeitem = getTreeItem(path);
+  var activeElem = document.querySelector("#navigation-pane .active");
+  if (activeElem) {
+    activeElem.classList.remove("active");
+  }
+  treeitem.classList.add("active");
+}
+function displayFolder(folder, contentpane, path) {
+  path ||= getItemPath(folder);
+  applyGlobalCommandBarItems();
+  var commandbar = document.getElementById("command-bar");
+  contentpane ||= document.getElementById("contents-pane");
+  if (contentpane.id == "contents-pane") {
+    contentpane.innerHTML = "";
+  }
+  contentpane.setAttribute("type", "folder");
+  for (var i = 0; i < folder.children.length; i++) {
+    (function(){
+      var item = folder.children[i];
+      if (item.localName == "rtf" && item.getAttribute("type") == "inline") {
+        var elem = document.getElementById("rtf-" + item.getAttribute("docid"));
+        if (elem && elem.content) {
+          contentpane.appendChild(elem.content.cloneNode(true));
+        }
+        //var children = document.getElementById("rtf-" + item.getAttribute("docid")).childNodes;
+        //for (var x = 0; x < children.length; x++) {
+        //  contentpane.appendChild(children[i].cloneNode(true));
+        //}
+      } else if (item.localName == "pageclass") {
+        contentpane.className += " " + item.textContent;
+      } else if (item.localName == "commandbutton") {
+        var buttonContainer = document.createElement("a");
+        buttonContainer.textContent = item.getAttribute("name");
+        buttonContainer.href = item.getAttribute("target");
+        commandbar.appendChild(buttonContainer);
+      } else if (item.localName == "dirheader") {
+        var headerContainer = document.createElement("div");
+        headerContainer.className = item.getAttribute("class");
+        headerContainer.classList.add("dirheader-container");
+        var headerImage = document.createElement("img");
+        headerContainer.appendChild(headerImage);
+        headerImage.alt = "";
+        headerImage.src = "/icons/full/" + item.getAttribute("icon") + ".ico";
+        headerImage.type = "image/x-icon";
+        var headerBody = document.createElement("div");
+        headerContainer.appendChild(headerBody)
+        headerBody.classList.add("dirheader-body");
+        var headerTitle = document.createElement("div");
+        headerBody.appendChild(headerTitle);
+        headerTitle.textContent = item.getAttribute("name");
+        headerTitle.classList.add("dirheader-title");
+        var headerDescription = document.createElement("div");
+        headerBody.appendChild(headerDescription);
+        headerDescription.innerHTML = item.innerHTML;
+        headerDescription.classList.add("dirheader-description");
+        contentpane.appendChild(headerContainer);
+        var headerPadding = document.createElement("div");
+        headerPadding.className = item.getAttribute("class");
+        headerPadding.classList.add("dirheader-padding")
+        contentpane.appendChild(headerPadding);
+      } else if (item.localName == "group") {
+        var contentbox = document.createElement("div");
+        contentbox.style.flexGrow = item.getAttribute("grow");
+        contentbox.style.flexShrink = item.getAttribute("shrink");
+        contentbox.style.flexBasis = item.getAttribute("pref-width");
+        contentbox.style.minWidth = item.getAttribute("min-width");
+        contentbox.style.minHeight = item.getAttribute("min-height");
+        contentbox.style.maxWidth = item.getAttribute("max-width");
+        contentbox.setAttribute("class", item.getAttribute("class") || "");
+        contentbox.classList.add("content-pane");
+        contentbox.classList.add("content-group");
+        if (item.hasAttribute("name")) {
+          var headerContainer = document.createElement("div");
+          contentbox.appendChild(headerContainer);
+          headerContainer.classList.add("groupheader-container");
+          var headerBullet = document.createElement("div");
+          headerContainer.appendChild(headerBullet);
+          headerBullet.classList.add("groupheader-bullet");
+          var headerText = document.createElement("div");
+          headerContainer.appendChild(headerText);
+          headerText.classList.add("groupheader-text");
+          headerText.textContent = item.getAttribute("name");
+          var headerBorder = document.createElement("div");
+          headerContainer.appendChild(headerBorder);
+          headerBorder.classList.add("groupheader-border");
+        }
+        contentpane.appendChild(contentbox);
+        if (item.hasAttribute("ytid")) {
+          var video = document.createElement("video");
+          video.setAttribute("ytid", item.getAttribute("ytid"));
+          displayVideo(video, contentbox);
+        } else {
+          displayFolder(item, contentbox, path);
+        }
+      } else if (item.localName == "groupheader") {
+        var headerContainer = document.createElement("div");
+        contentpane.appendChild(headerContainer);
+        headerContainer.classList.add("groupheader-container");
+        var headerBullet = document.createElement("div");
+        headerContainer.appendChild(headerBullet);
+        headerBullet.classList.add("groupheader-bullet");
+        var headerText = document.createElement("div");
+        headerContainer.appendChild(headerText);
+        headerText.classList.add("groupheader-text");
+        headerText.textContent = item.getAttribute("name");
+        var headerBorder = document.createElement("div");
+        headerContainer.appendChild(headerBorder);
+        headerBorder.classList.add("groupheader-border");
+      } else {
+        var link = document.createElement("a");
+        contentpane.appendChild(link);
+        if (item.localName == "link") {
+          link.href = item.getAttribute("href");
+          link.target = "_blank";
+        } else {
+          link.href = path + encodeName(item.getAttribute("name"));
+        }
+        link.tabIndex = 0;
+        link.addEventListener("focus", function(){
+          var activeElem = document.querySelector(".content-pane .active");
+          if (activeElem) {
+            activeElem.classList.remove("active");
+          }
+          link.classList.add("active");
+        });
+        link.addEventListener("click", function(event){
+          event.preventDefault();
+        });
+        link.addEventListener("dblclick", function(event){
+          event.preventDefault();
+          navigateItem(item);
+        });
+        var itemContainer = document.createElement("div");
+        link.appendChild(itemContainer);
+        itemContainer.classList.add("item-container");
+        var iconContainer = document.createElement("div");
+        itemContainer.appendChild(iconContainer);
+        iconContainer.classList.add("icon");
+        var iconCrop = document.createElement("div");
+        iconContainer.appendChild(iconCrop);
+        iconCrop.classList.add("iconCrop");
+        var icon = document.createElement("img");
+        iconCrop.appendChild(icon);
+        icon.alt = "";
+        if (item.getAttribute("icon") == "video" && item.hasAttribute("ytid")) {
+          iconContainer.classList.add("video");
+          icon.src = "https://img.youtube.com/vi/" + item.getAttribute("ytid") + "/maxresdefault.jpg";
+          var videoOverlay = document.createElement("div");
+          iconContainer.appendChild(videoOverlay);
+          videoOverlay.classList.add("videoOverlay");
+        } else {
+          icon.src = "/icons/full/" + item.getAttribute("icon") + ".ico";
+          icon.type = "image/x-icon";
+        }
+        if (item.hasAttribute("description")) {
+          var textContainer = document.createElement("div");
+          link.appendChild(textContainer);
+          textContainer.classList.add("text-container");
+          var name = document.createElement("div");
+          textContainer.appendChild(name);
+          name.classList.add("name");
+          name.textContent = item.getAttribute("name");
+          var description = document.createElement("p");
+          textContainer.appendChild(description);
+          description.classList.add("item-description");
+          description.textContent = item.getAttribute("description");
+        } else {
+          var name = document.createElement("div");
+          itemContainer.appendChild(name);
+          name.classList.add("name");
+          name.textContent = item.getAttribute("name");
+        }
+      }
+    })();
+  }
+}
+function folderToTreeView(folder, insert) {
+  var details = document.createElement("details");
+  insert.appendChild(details);
+  if (folder.hasAttribute("open")) {
+    details.open = true;
+  }
+  if (folder.hasAttribute("active")) {
+    details.classList.add("active");
+  }
+  details.classList.add("leaf");
+  var summary = document.createElement("summary");
+  summary.tabIndex = "-1";
+  details.appendChild(summary);
+  summary.addEventListener("focus", function(){
+    var activeElem = document.querySelector("#navigation-pane .active");
+    if (activeElem) {
+      activeElem.classList.remove("active");
+    }
+    details.classList.add("active");
+  });
+  var padlink = document.createElement("a");
+  summary.appendChild(padlink);
+  padlink.href = getItemPath(folder);
+  padlink.addEventListener("click", function(event){
+    event.preventDefault();
+    navigateItem(folder);
+  });
+  padlink.tabIndex = "-1";
+  padlink.setAttribute("aria-hidden", "true");
+  var div = document.createElement("div");
+  summary.appendChild(div);
+  var bullet = document.createElement("span");
+  div.appendChild(bullet);
+  bullet.classList.add("bullet");
+  var bodylink = document.createElement("a");
+  div.appendChild(bodylink);
+  bodylink.href = getItemPath(folder);
+  bodylink.addEventListener("click", function(event){
+    event.preventDefault();
+    navigateItem(folder);
+  });
+  var icon = document.createElement("img");
+  bodylink.appendChild(icon);
+  icon.alt = "";
+  icon.src = "/icons/16x16/" + folder.getAttribute("icon") + ".png";
+  var name = document.createElement("span");
+  bodylink.appendChild(name);
+  name.classList.add("name");
+  name.textContent = folder.getAttribute("name");
+  for (var i = 0; i < folder.children.length; i++) {
+    var subfolder = folder.children[i];
+    if (subfolder.hasAttribute("navpin") ? 
+        !!JSON.parse(subfolder.getAttribute("navpin")) ||
+        subfolder.getAttribute("navpin") == ""
+        : subfolder.localName == "folder") {
+      details.classList.remove("leaf");
+      folderToTreeView(subfolder, details);
+    }
+  }
+};
+function navigateCurrentURI() {
+  var target = getItemForPath(decodeURIComponent(location.pathname));
+  if (target) {
+    navigateItem(target, true);
+  } else {
+    // 404 not found
+  }
+}
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}document.addEventListener("DOMContentLoaded", function(){
+  var folder = document.getElementById("fsroot");
+  var navpane = document.getElementById("navigation-pane");
+  navpane.innerHTML = "";
+  for (var i = 0; i < folder.children.length; i++) {
+    var subfolder = folder.children[i];
+    if (subfolder.hasAttribute("navpin") ? 
+        !!JSON.parse(subfolder.getAttribute("navpin")) ||
+        subfolder.getAttribute("navpin") == ""
+        : subfolder.localName == "folder")
+    {
+      folderToTreeView(subfolder, navpane);
+    }
+  }
+  navigateCurrentURI();
+  addEventListener("popstate", function(){navigateCurrentURI()});
+});
+</script>
+
+<folder id="fsroot">
+  <folder name="Favorites" icon="favorites" open>
+    <folder name="Desktop" icon="desktop">
+    </folder>
+    <folder name="Downloads" icon="downloads">
+    </folder>
+  </folder>
+  <folder name="Libraries" icon="libraries" open>
+    <folder name="Documents" icon="documents" open>
+    </folder>
+    <folder name="Music" icon="music">
+    </folder>
+    <folder name="Pictures" icon="pictures">
+    </folder>
+    <folder name="Videos" icon="videos" open>
+    </folder>
+  </folder>
+  <folder name="HomeGroup" icon="homegroup" open>
+  </folder>
+  <folder name="Computer" icon="computer" open>
+    <groupheader name="Hard Disk Drives"></groupheader>
+    <folder name="Windows (C:)" icon="windrive">
+      <folder name="Program Files" icon="folder">
+      </folder>
+      <folder name="Program Files (x86)" icon="folder">
+      </folder>
+      <folder name="User" icon="folder">
+      </folder>
+      <folder name="Windows" icon="folder">
+      </folder>
+    </folder>
+    <folder name="Data (E:)" icon="fixeddrive">
+    </folder>
+  </folder>
+  <folder name="Network" icon="network" open>
+  </folder>
+</folder>
+
+<div id="command-bar"></div>
+<div id="vertical-pane-content">
+  <div id="left-container">
+    <div id="navigation-pane" tabindex="0"></div>
+  </div>
+  <div id="contents-pane" tabindex="0" class="content-pane"></div>
+</div>
+<div id="details-pane">
+</div>
+</html>

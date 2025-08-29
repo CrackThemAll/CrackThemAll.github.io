@@ -1,0 +1,10 @@
+{
+  "name": "main",
+  "version": "0",
+  "dependencies": {
+    "jsdom": "^26.0.0",
+    "main": "file:",
+    "npm": "^11.1.0",
+    "serve-handler": "^6.1.6"
+  }
+}
