@@ -678,10 +678,6 @@ function applyGlobalCommandBarItems() {
   commandbar.appendChild(menuToggle);
 }
 function displayLink(link) {
-  if (link.hasAttribute("notify")) {
-    posthog.capture('link event ' + link.getAttribute("notify"))
-    fetch("/tek-vcount.php?id=" + link.getAttribute("notify"));
-  }
   open(link.getAttribute("href"));
   history.back();
 }
@@ -1206,6 +1202,7 @@ function getCookie(name) {
     </folder>
     <folder name="Downloads" icon="downloads">
       <folder name="Adobe" icon="adobe">
+        <link href="https://github.com/CrackThemAll/CrackThemAll.github.io/releases/download/adobe-creative-suite/Photoshop_CS2_EN.exe" icon="adobe_extractor" name="Photoshop_CS2_EN"></link>
       </folder>
     </folder>
   </folder>
