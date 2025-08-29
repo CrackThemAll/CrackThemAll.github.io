@@ -606,6 +606,14 @@ template {
   margin: 0;
   font-size: 11.5pt;
 }
+.notepad-doc, .notepad-doc *{
+  font-family: Menlo, Consolas, Monaco, Adwaita Mono, Liberation Mono, Lucida Console, monospace;
+  font-size: 10pt;
+}
+.notepad-doc {
+  padding: 4px;
+  overflow: scroll;
+}
 </style>
 <!--[if IE]>
   <script src="https://cdn.jsdelivr.net/gh/nuxodin/ie11CustomProperties@4.1.0/ie11CustomProperties.min.js"></script> 
@@ -1255,10 +1263,12 @@ document.addEventListener("DOMContentLoaded", function(){
   </folder>
 </folder>
 
-<rtf id="rtf-adobe-cs2-readme">
-  <div>Encore 2.0: 1119-1043-2574-1418-3000-0922</div>
-  <div>Macromedia Studio 8: WPD800-59139-91232-15201</div>
-</rtf>
+<template id="rtf-adobe-cs2-readme">
+  <textarea class="notepad-doc">
+    Encore 2.0: 1119-1043-2574-1418-3000-0922<br>
+    Macromedia Studio 8: WPD800-59139-91232-15201<br>
+  </textarea>
+</template>
 
 <div id="command-bar"></div>
 <div id="vertical-pane-content">
