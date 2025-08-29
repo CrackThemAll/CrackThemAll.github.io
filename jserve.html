@@ -693,9 +693,13 @@ function displayRTF(rtf) {
   var contentpane = document.getElementById("contents-pane");
   contentpane.innerHTML = "";
   contentpane.setAttribute("type", "rtf");
-  var children = document.getElementById("rtf-" + rtf.getAttribute("docid")).childNodes;
-  for (var i = 0; i < children.length; i++) {
-    contentpane.appendChild(children[i].cloneNode(true));
+  var doc = document.getElementById("rtf-" + rtf.getAttribute("docid"));
+  if (doc.content) {
+    contentpane.appendChild(doc.content.cloneNode(true));
+  } else {
+    for (var i = 0; i < doc.childNodes.length; i++) {
+      contentpane.appendChild(doc.childNodes[i].cloneNode(true));
+    }
   }
 }
 function displayVideoPrerender(video, contentpane) {
