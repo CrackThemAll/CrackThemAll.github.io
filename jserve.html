@@ -631,7 +631,7 @@ function navigateItem(item, replace) {
     history.pushState(null, "", getItemPath(item));
   }
   if (item.id == "fsroot") {
-    item = getItemForPath("/Favorites/Home/");
+    item = getItemForPath("/Favorites/Downloads/");
   }
   var navpane = document.getElementById("navigation-pane");
   navpane.classList.remove("reveal");
